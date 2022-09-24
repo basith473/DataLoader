@@ -1,0 +1,167 @@
+<template>
+    <div class="custom-modal">
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+          <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <span class="slds-modal__close">
+                  <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" onclick={closeModal}>
+                  </lightning-icon>
+                </span>
+                <h2 class="slds-text-heading_medium slds-hyphenate">
+                  Update Records
+                </h2>
+            </header>
+          <div class="slds-modal__content slds-p-around_large slds-is-relative">
+            <template if:true={isModalLoading}>
+              <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+            </template>
+            <lightning-tabset variant="scoped" active-tab-value="Add Profile">
+              <lightning-tab label="Add Profile" value="Add Profile">
+                <div class="slds-col slds-size_1-of-2 slds-p-bottom_large">
+                  <lightning-combobox name="profiles" label="Select Profile" placeholder="Select a Profile"
+                    options={profileOptions} onchange={handleProfileChange} required></lightning-combobox>
+                </div>
+                <div class="slds-grid slds-wrap">
+                  <div class="slds-col slds-size_1-of-2">
+                    <lightning-radio-group name="radioGroupProfile" label="Apply to" options={radioOptions}
+                      value={profileFilter} type="radio" onchange={handleRadioButton} required></lightning-radio-group>
+                  </div>
+                </div>
+
+                <!-- create custom filter to add Profiles based on roles-->
+                <div class="slds-col slds-size_1-of-2 slds-p-top_large">
+                  <lightning-button variant="brand" label="Advanced Filter" title="Advanced Filter"
+                    onclick={showAdvancedFilter}></lightning-button>
+                </div>
+                <div class="advancedFilterHolder">
+                  <template if:true={showPillContainer}>
+                    <lightning-pill-container items={selectedFilters} onitemremove={handleRemoveFilter}>
+                    </lightning-pill-container>
+                  </template>
+                </div>
+
+                <!--Advanced Filter Holder-->
+                <template if:true={isAdvancedFilter}>
+                  <div class="slds-p-around_medium">
+                    <div class="slds-box">
+                      <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-1">
+                          Apply Filter Based on Role
+                        </div>
+                        <template if:true={isRolesAdded}>
+                          <div class="slds-col slds-size_1-of-2 slds-p-top_small">
+                            <lightning-combobox name="advancedFilterRole" data-id="advancedFilterRole"
+                              label="Select Role" placeholder="Select a Role" options={filterRoleOpions} required>
+                            </lightning-combobox>
+                          </div>
+                          <div class="slds-col slds-size_1-of-2 slds-p-left_small slds-p-top_small">
+                            <lightning-combobox name="advancedFilterProfile" data-id="advancedFilterProfile"
+                              label="Select Profile" placeholder="Select a Profile" options={profileOptions} required>
+                            </lightning-combobox>
+                          </div>
+                        </template>
+                        <template if:false={isRolesAdded}>
+                          <div class="slds-text-color_error">
+                            Please update Roles before adding Advanced Filter.
+                          </div>
+                        </template>
+                      </div>
+                      <div class="slds-clearfix slds-p-top_medium">
+                        <div class="slds-float_right">
+                          <lightning-button variant="neutral" label="Cancel" title="Cancel"
+                            onclick={closeAdvancedFilter}></lightning-button>
+                          <template if:true={isRolesAdded}>
+                            <lightning-button class="slds-p-left_small" variant="brand" label="Add" title="Add"
+                              onclick={applyAdvancedFilter}></lightning-button>
+                          </template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <div class="slds-grid slds-grid_align-end">
+                  <div class="slds-col slds-p-top_small">
+                    <lightning-button class="slds-p-left_small" variant="brand" label="Apply" title="Apply"
+                      onclick={handleModalSave}></lightning-button>
+                  </div>
+                </div>
+              </lightning-tab>
+              <lightning-tab label="Add Role" value="Add Role">
+                <div class="slds-col slds-size_1-of-2 slds-p-bottom_large">
+                  <lightning-combobox name="roles" label="Select Role" placeholder="Select a Role" options={roleOptions}
+                    onchange={handleRoleChange} required></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                  <lightning-radio-group name="radioGroupRole" label="Apply to" options={radioOptions}
+                    value={roleFilter} type="radio" onchange={handleRadioButton} required></lightning-radio-group>
+                </div>
+                <div class="slds-grid slds-grid_align-end">
+                  <div class="slds-col slds-p-top_small">
+                    <lightning-button class="slds-p-left_small" name="role" variant="brand" label="Apply" title="Apply"
+                      onclick={handleModalSave}></lightning-button>
+                  </div>
+                </div>
+              </lightning-tab>
+              <lightning-tab label="Assign PermissonSet" value="Assign PermissonSet" onactive={handlePermissionTab}>
+                <lightning-dual-listbox class="slds-p-around_small" name="PermissionSet" label="Select PermissionSet"
+                  source-label="Available" selected-label="Selected"
+                  field-level-help="Select PermissionSet from the available list" options={permissionSetOptions}
+                  onchange={handlePermisssionSelected}>
+                </lightning-dual-listbox>
+                <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                  <lightning-radio-group name="radioGroupPermission" label="Apply to" options={radioOptions}
+                    value={permissionFilter} type="radio" onchange={handleRadioButton} required></lightning-radio-group>
+                </div>
+                <div class="slds-grid slds-grid_align-end">
+                  <div class="slds-col slds-p-top_small">
+                    <lightning-button class="slds-p-left_small" variant="brand" label="Apply" title="Apply"
+                      onclick={handleModalSave}></lightning-button>
+                  </div>
+                </div>
+              </lightning-tab>
+              <lightning-tab label="Clone Permission" value="Clone Permission">
+                <!-- <c-custom-lookup lookup-label="User" icon-name="standard:user" search-field="Name"
+                  object-api-name="User" field-to-query="Id, Name, isActive" onrecordselection={UserSelection}
+                  source="clone"></c-custom-lookup>
+                <template if:true={showCloneData}>
+                  <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                      <lightning-input type="text" label="Profile" value={selectedUser.profileName}
+                        data-id={selectedUser.profileId} readonly></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                      <lightning-input type="text" label="Role" value={selectedUser.roleName}
+                        data-id={selectedUser.roleId} readonly></lightning-input>
+                    </div>
+                  </div>
+                  <template if:true={hasPermissionSet}>
+                    <lightning-dual-listbox class="slds-p-around_small" name="PermissionSet"
+                      label="Select PermissionSet" source-label="Available" selected-label="Selected"
+                      field-level-help="Select PermissionSet from the available list" options={permissionSetOptions}
+                      onchange={handlePermisssionSelected}>
+                    </lightning-dual-listbox>
+                  </template>
+                  <div class="slds-col slds-size_1-of-2">
+                    <lightning-radio-group name="clonePermission" label="Apply to" options={radioOptions}
+                      value={profileFilter} type="radio" onchange={handleRadioButton} required></lightning-radio-group>
+                  </div>
+                  <div class="slds-grid slds-grid_align-end">
+                    <div class="slds-col slds-p-top_small">
+                      <lightning-button class="slds-p-left_small" name="Clone" variant="brand" label="Apply"
+                        title="Apply" onclick={handleModalSave}></lightning-button>
+                    </div>
+                  </div>
+                </template> -->
+              </lightning-tab>
+            </lightning-tabset>
+            </div>
+            <footer class="slds-modal__footer">
+              <lightning-button label="Done" title="Done" class="slds-m-right_small" onclick={closeModal}>
+              </lightning-button>
+              <!-- <lightning-button variant="brand" label="Done" title="Save" onclick={closeModal}></lightning-button> -->
+            </footer>
+          </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+</template>

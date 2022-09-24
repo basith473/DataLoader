@@ -1,0 +1,99 @@
+<template>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-3">
+          <lightning-combobox
+            name="ObjectApi"
+            label="Select Object"
+            placeholder="Select an Object"
+            options={objectOptions}
+            onchange={handleUploadChange}
+          ></lightning-combobox>
+        </div>
+    </div>
+
+    <template if:true={showUpload}>
+        <div class="slds-p-around_small">
+          <lightning-file-upload
+            accept={acceptedFormats}
+            label="Upload File"
+            onuploadfinished={handleUploadFinished}
+          ></lightning-file-upload>
+        </div>
+        <template if:true={displayTable}>
+          <div class="slds-p-top_medium">
+            <article class="slds-card slds-card_boundary">
+              <div class="slds-card__body slds-p-horizontal_small">
+                <div class="slds-grid slds-wrap slds-gutters">
+                  <div class="slds-col slds-size_3-of-6 slds-p-top_x-small">
+                    <span class="slds-p-left_small"
+                      >Total Records : {totalRecordCount}</span
+                    >
+                    <span class="slds-p-left_small"
+                      >Submitted Records : {sumbittedRecordCount}</span
+                    >
+                    <span class="slds-p-left_small"
+                      >Failed Records : {failedRecordCount}</span
+                    >
+                  </div>
+                  <div class="slds-col slds-size_1-of-6">
+                    <template if:true={showToggle}>
+                      <div class="slds-clearfix">
+                        <div class="slds-float_left">
+                          <lightning-input
+                            type="toggle"
+                            label="Submitted Records"
+                            name="failedToggle"
+                            onchange={handleToggle}
+                          ></lightning-input>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                  <div class="slds-col slds-size_2-of-6">
+                    <div class="slds-clearfix">
+                      <div class="slds-float_right">
+                        <lightning-button
+                          variant="brand"
+                          label="Update Records"
+                          title="Update Records"
+                          onclick={handleUpdateRecords}
+                        ></lightning-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="slds-p-top_medium">
+                  <c-display-records
+                    table-headers={tableHeaders}
+                    record-list={recordList}
+                    object-name={selectedUploadObject}
+                    field-names={columns}
+                    profile-options={profileOptions}
+                    role-options={roleOptions}
+                    onrecordchange={updateRecordList}
+                    permission-details={permissionDetails}
+                    permission-options={permissionSetOptions}
+                    set-permission={setPermissionDetails}
+                  ></c-display-records>
+                </div>
+                <div class="slds-p-top_medium slds-align_absolute-center">
+                  <lightning-button
+                    class={submitClass}
+                    variant="brand"
+                    label="Submit"
+                    title="Submit"
+                    onclick={handleSubmit}
+                  ></lightning-button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </template>
+    </template>
+
+    <template if:true={openModal}>
+      <c-upload-component-modal onclosemodal={closeModal} selected-records={selectedRecords} record-list={recordList}
+      onrecordupdate={updateRecord}></c-upload-component-modal>
+    </template>
+</template>

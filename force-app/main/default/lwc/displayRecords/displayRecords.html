@@ -1,0 +1,139 @@
+<template>
+  <lightning-datatable
+    columns={tableHeaders}
+    key-field="Id"
+    data={recordList}
+    onrowaction={handleRowAction}
+  >
+  </lightning-datatable>
+
+  <!--Record Edit Form-->
+  <template if:true={showModal}>
+    <div class="custom-modal">
+      <section role="dialog" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <span class="slds-modal__close">
+              <lightning-icon
+                data-id="recordEditModal"
+                icon-name="utility:close"
+                variant="inverse"
+                alternative-text="close"
+                onclick={closeModal}
+              ></lightning-icon>
+            </span>
+            <h2 class="slds-text-heading_medium slds-hyphenate">
+              Edit User
+            </h2>
+          </header>
+          <div
+            class="slds-modal__content slds-p-around_medium slds-is-relative"
+          >
+            <template if:true={isModalLoading}>
+              <lightning-spinner
+                alternative-text="Loading"
+                size="large"
+                variant="brand"
+              ></lightning-spinner>
+            </template>
+            <lightning-record-edit-form
+              id="recordViewForm"
+              object-api-name={objectName}
+              onsubmit={editSubmit}
+              onerror={editError}
+            >
+              <lightning-messages></lightning-messages>
+              <div class="slds-grid slds-wrap">
+                <template for:each={columns} for:item="col" for:index="index">
+                  <div class="slds-col slds-size_1-of-2" key={col.label}>
+                    <template if:true={col.isProfileorRole}>
+                      <div class="slds-p-horizontal_xxx-small">
+                        <c-lwc-lookup
+                          lookup-label={col.label}
+                          icon-name="standard:account"
+                          search-field="Name"
+                          object-api-name={col.objectApiName}
+                          profile-or-role-id={col.value}
+                          field-to-query="Id, Name"
+                          onrecordselection={onProfileOrRoleSelection}
+                        ></c-lwc-lookup>
+                      </div>
+                    </template>
+                    <template if:false={col.isProfileorRole}>
+                      <lightning-input-field
+                        field-name={col.label}
+                        value={col.value}
+                        disabled={col.isDisabled}
+                      ></lightning-input-field>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </lightning-record-edit-form>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              data-id="recordEditModal"
+              label="Cancel"
+              title="Cancel"
+              class="slds-m-right_small"
+              onclick={closeModal}
+            ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label="Update"
+              title="Update"
+              onclick={handleSubmit}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+  </template>
+
+  <!-- Permission Set display modal-->
+  <template if:true={showPermission}>
+    <div class="custom-modal">
+      <section role="dialog" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <span class="slds-modal__close">
+              <lightning-icon
+                  data-id="permissionModal"
+                  icon-name="utility:close"
+                  variant="inverse"
+                  alternative-text="close"
+                  onclick={closeModal}
+              ></lightning-icon>
+            </span>
+            <h2 class="slds-text-heading_medium slds-hyphenate">
+              Permission Sets
+            </h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium">
+            <template for:each={selectedPermission} for:item="perm" for:index="index">
+              <lightning-pill
+                class="slds-p-horizontal_x-small slds-p-top_small"
+                label={perm.label}
+                key={perm.label}
+                name={index}
+                onremove={handleRemovePermissions}
+              ></lightning-pill>
+            </template>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              data-id="permissionModal"
+              label="Cancel"
+              title="Cancel"
+              class="slds-m-right_small"
+              onclick={closeModal}
+            ></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+  </template>
+</template>

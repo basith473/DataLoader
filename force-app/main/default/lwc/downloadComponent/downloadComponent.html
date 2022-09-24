@@ -1,0 +1,67 @@
+<template>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-3">
+          <lightning-combobox
+            name="ObjectApi"
+            label="Select Object"
+            placeholder="Select an Object"
+            options={objectOptions}
+            onchange={handleChange}
+          ></lightning-combobox>
+        </div>
+    </div>
+
+    <template if:true={showHeader}>
+        <div class="slds-grid slds-grid_align-end">
+          <!-- <div class="slds-col">
+            <lightning-input
+              data-id="addNewField"
+              type="text"
+              variant="standard"
+              name="addField"
+              label="Enter Field Api Name"
+              placeholder="Field Name..."
+            ></lightning-input>
+          </div> -->
+          <div class="slds-col slds-p-top_large slds-p-left_small">
+            <lightning-button
+              variant="brand"
+              label="Add New Field"
+              title="Add New Field"
+              onclick={addNewField}
+            ></lightning-button>
+          </div>
+        </div>
+
+        <div
+          class="slds-p-around_medium slds-p-top_large slds-m-horizontal_xx-large"
+        >
+         <div class="slds-box slds-box__xx-small">
+            <template
+              for:each={pillColumns}
+              for:item="col"
+              for:index="index"
+            >
+              <lightning-pill
+                class="slds-p-horizontal_x-small slds-p-top_small"
+                label={col.label}
+                key={col.label}
+                name={index}
+                onremove={handleRemoveColumns}
+              ></lightning-pill>
+            </template>
+          </div>
+          <div
+            class="slds-col slds-size_1-of-3 slds-p-top_medium slds-align_absolute-center"
+          >
+            <lightning-button
+              variant="brand"
+              label="Download Excel"
+              title="Download"
+              disabled={isDisabled}
+              onclick={downloadCSV}
+            ></lightning-button>
+          </div>
+        </div>
+    </template>
+</template>
