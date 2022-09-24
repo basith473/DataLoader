@@ -1,0 +1,46 @@
+<template>
+  <template if:true={isLoading}>
+    <lightning-spinner
+      alternative-text="Loading"
+      size="large"
+      variant="brand"
+    ></lightning-spinner>
+  </template>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-3">
+          <c-custom-lookup
+            lookup-label="User"
+            icon-name="standard:user"
+            search-field="Name"
+            object-api-name="User"
+            field-to-query="Id, Name, isActive"
+            onrecordselection={UserSelection}
+            source="active/deactive"
+          ></c-custom-lookup>
+        </div>
+        <div class="slds-col slds-size_1-of-3 slds-p-top_large">
+          <div class="slds-grid">
+            <div class="slds-col">
+              <lightning-input
+                class="slds-p-left_small slds-p-top_xx-small"
+                type="checkbox"
+                label="isActive"
+                data-id="checkbox"
+                disabled
+              ></lightning-input>
+            </div>
+            <div class="slds-col">
+              <template if:true={showActiveDeactive}>
+                <lightning-button
+                  class="slds-p-left_small"
+                  variant="brand"
+                  label={btnActivateDeactivate}
+                  title="Activate Deactivate Button"
+                  onclick={handleActivate}
+                ></lightning-button>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+</template>
